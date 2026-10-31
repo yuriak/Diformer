@@ -1,0 +1,9 @@
+name: diformer
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip=23.3.2
+  - setuptools=59.5.0
+  - wheel=0.38.4
+# Then run bash scripts/install.sh inside this environment.
