@@ -1,14 +1,36 @@
-# Diformer
+<h1 align="center">Diformer: Directional Transformer<br>for Neural Machine Translation</h1>
 
-**One translation model, three generation directions, four decoding strategies.**
+<p align="center">
+  <strong>One translation model · Three generation directions · Four decoding strategies</strong>
+</p>
 
-Source code for **Diformer: Directional Transformer for Neural Machine Translation**
-(EAMT 2022), by Minghan Wang, Jiaxin Guo, Yuxia Wang, Daimeng Wei, Hengchao Shang,
-Yinglu Li, Chang Su, Yimeng Chen, Min Zhang, Shimin Tao, and Hao Yang.
+<p align="center">
+  Minghan Wang, Jiaxin Guo, Yuxia Wang, Daimeng Wei, Hengchao Shang,<br>
+  Yinglu Li, Chang Su, Yimeng Chen, Min Zhang, Shimin Tao, Hao Yang
+</p>
 
-[Paper](https://aclanthology.org/2022.eamt-1.11/) ·
-[PDF](https://aclanthology.org/2022.eamt-1.11.pdf) ·
-[arXiv](https://arxiv.org/abs/2112.11632)
+<p align="center">
+  <a href="https://aclanthology.org/2022.eamt-1.11/"><img src="https://img.shields.io/badge/EAMT-2022-536878?style=flat-square" alt="EAMT 2022"></a>
+  <a href="https://arxiv.org/abs/2112.11632"><img src="https://img.shields.io/badge/arXiv-2112.11632-B31B1B?style=flat-square&amp;logo=arxiv" alt="arXiv 2112.11632"></a>
+  <a href="https://aclanthology.org/2022.eamt-1.11.pdf"><img src="https://img.shields.io/badge/Paper-PDF-EA4335?style=flat-square" alt="Read the paper PDF"></a>
+  <br>
+  <a href="environment.yml"><img src="https://img.shields.io/badge/Python-3.9-3776AB?style=flat-square&amp;logo=python&amp;logoColor=white" alt="Python 3.9"></a>
+  <a href="requirements.txt"><img src="https://img.shields.io/badge/PyTorch-1.13.1-EE4C2C?style=flat-square&amp;logo=pytorch&amp;logoColor=white" alt="PyTorch 1.13.1"></a>
+  <a href="third_party/README.md"><img src="https://img.shields.io/badge/fairseq-0.12.2-0467DF?style=flat-square" alt="fairseq 0.12.2"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3A7D44?style=flat-square" alt="MIT License"></a>
+</p>
+
+<p align="center">
+  <a href="#method">Method</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#data-preparation">Data</a> ·
+  <a href="#training">Training</a> ·
+  <a href="#translation">Translation</a> ·
+  <a href="#bleu-evaluation">Evaluation</a> ·
+  <a href="#citation">Citation</a>
+</p>
+
+---
 
 Diformer jointly learns left-to-right (L2R), right-to-left (R2L), and straight
 generation with a Directional Language Model objective. At inference time, the
@@ -23,6 +45,15 @@ During training, each target position independently samples one of three
 directions, with BOS fixed to L2R and EOS fixed to R2L. The input sentence stays
 in its original order; the prediction target shifts according to the sampled
 direction:
+
+<p align="center">
+  <img src="assets/diformer-training.png" width="440" alt="Diformer training example: direction-dependent prediction targets, attention masks, relative distances, and directional position embeddings.">
+</p>
+
+<p align="center">
+  <em>Figure 1. Training Diformer with the Directional Language Model.<br>
+  Grid values show relative K/V distances with respect to each query; shaded cells indicate masked attention.</em>
+</p>
 
 | Direction | Prediction from input position `i` | Visible target context |
 | --- | --- | --- |
@@ -39,6 +70,9 @@ without leaking absolute direction-dependent positions through the K/V stream.
 Training minimizes label-smoothed token cross-entropy plus `0.1` times the
 target-length cross-entropy. Length prediction is used only by NAR decoding;
 AR generation terminates when the appropriate boundary token is predicted.
+
+See [implementation notes](docs/implementation.md) for details on directional
+attention, refinement, and candidate scoring.
 
 ## Installation
 
@@ -58,11 +92,16 @@ requires the pinned pip version. For GPU training, use a PyTorch 1.13.1 build
 appropriate for your CUDA installation. A compiler is needed to build fairseq's
 extensions.
 
-If the repository was cloned without submodules:
+<details>
+<summary><strong>Already cloned without submodules?</strong></summary>
+
+Initialize the fairseq dependency from the repository root:
 
 ```bash
 git submodule update --init --recursive
 ```
+
+</details>
 
 The submodule pins `4a388e64cd646ed7d7ad8de8fae55df2b8eea91d`. See
 [third_party/README.md](third_party/README.md) for submodule setup.
@@ -250,6 +289,8 @@ diformer/
   generators/scoring.py             Directional sequence likelihoods
 configs/                           WMT training presets
 scripts/                           Installation, data, training and evaluation
+assets/                            Method illustration
+docs/                              Implementation notes
 third_party/fairseq/                Pinned, unmodified dependency submodule
 ```
 
